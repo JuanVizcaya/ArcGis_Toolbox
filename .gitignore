@@ -2,12 +2,24 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.xml
 
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+
+**/data
+**/dbfpy
+**/licens
+**/lxml
+**/pptx
+**/tables
+**/xlrd
+**/xlutils
+**/Xlwt
+
 env/
 build/
 develop-eggs/

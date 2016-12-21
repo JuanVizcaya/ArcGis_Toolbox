@@ -1,0 +1,1 @@
+arreglar el parametro universo del mes anterior en proceso de coordenadas
