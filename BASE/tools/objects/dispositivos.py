@@ -1,3 +1,6 @@
+
+
+
 # -*- coding: cp1252 -*-
 from __future__ import unicode_literals, print_function
 from arcpy import Parameter, mapping, RefreshTOC, SetProgressor, CreateUniqueName, AddMessage, SetProgressorPosition, Statistics_analysis, ResetProgressor, ListFields, AddField_management, AddJoin_management, CalculateField_management, RemoveJoin_management, FieldMappings, SetProgressorLabel, DeleteField_management, TableToTable_conversion, SelectLayerByAttribute_management,Merge_management
@@ -71,7 +74,7 @@ class disp_movil(calc_equiv):
         mkdir(main_dir)
         AddMessage(u"Se creó: {0}".format(main_dir).encode('cp1254'))
         chdir(main_dir)
-        dirs = ['01 - TABLAS BASE A UTILIZAR','02 - TABLAS BASE ACTUALIZAR CADA MES','03 - CATALOGOS_BASE','04 - CORRIDA_SCRIPTS_DISPOSITIVOS_MOVILES_{0}'.format(fech_act.strftime('%b%y').upper()),'05 - CORRIDA_SCRIPT_SEPARADA_POR_ENTIDAD','06 - FINALES_ID_SIIPSO','07 - SCRIPTS','08 - ENTREGAR_A_RUBEN']
+        dirs = ['01 - TABLAS BASE A UTILIZAR','02 - TABLAS BASE ACTUALIZAR CADA MES','03 - CATALOGOS_BASE','04 - CORRIDA_SCRIPTS_DISPOSITIVOS_MOVILES_{0}'.format(fech_act.strftime('%b%y').replace('.','').upper()),'05 - CORRIDA_SCRIPT_SEPARADA_POR_ENTIDAD','06 - FINALES_ID_SIIPSO','07 - SCRIPTS','08 - ENTREGAR_A_RUBEN']
         mklistdir(dirs)
         #__________________________________________
         #--------Copiando archivos necesarios--------
@@ -84,17 +87,18 @@ class disp_movil(calc_equiv):
             copy2(parameters[3].valueAsText,u'C_MUNICI.dbf')
         SetProgressorPosition(2)
         chdir(join(main_dir,dirs[1]))
-        copy2(join(main_path,'PROCESO_SIIPSO',r'CATALOGO_EMBONADO_CON_CAT_{0}\LOC_ACT_{0}.DBF'.format(fech_act.strftime('%b%y').upper())),'LOC_ACT.DBF')
+        copy2(join(main_path,'PROCESO_SIIPSO','CATALOGO_EMBONADO_CON_CAT_{0}\\LOC_ACT_{0}.DBF'.format(fech_act.strftime('%b%y').replace('.','').upper())),'LOC_ACT.DBF')
         copy_dir = join(bef_dir,dirs[1])
         SetProgressorPosition(3)
-        copy2(join(copy_dir,'equiv_vial_vs_cenfemul_{0}.dbf'.format(fech_ant.strftime('%b%y'))),'equiv_vial_vs_cenfemul_{0}.dbf'.format(fech_act.strftime('%b%y')))
+        
+        copy2(join(copy_dir,'equiv_vial_vs_cenfemul_{0}.dbf'.format(fech_ant.strftime('%b%y').replace('.',''))),'equiv_vial_vs_cenfemul_{0}.dbf'.format(fech_act.strftime('%b%y').replace('.','')))
         #copy2(parameters[2].valueAsText,'locsiter10vscenfemul{0}.dbf'.format(fech_act.strftime('%b%y')))
         chdir(join(main_dir,dirs[2]))
         copy_dir = join(bef_dir,dirs[2])
         SetProgressorPosition(4)
         for fil in ['cat_agebs.dbf','cat_manzanas.dbf','cat_municipio.dbf','cat_vialidades_completo.dbf']:
             copy2(join(copy_dir,fil),fil)
-        copy2(join(main_path,'CATALOGO_A_ENTREGAR','CATALOGO_CENFEMUL_{0}.dbf'.format(fech_act.strftime('%b%y'))),'cat_localidad.dbf')
+        copy2(join(main_path,'CATALOGO_A_ENTREGAR','CATALOGO_CENFEMUL_{0}.dbf'.format(fech_act.strftime('%b%y').replace('.',''))),'cat_localidad.dbf')
         embo = listdir(join(main_path,'CATALOGO_SEPOMEX'))[10]
         SetProgressorPosition(5)
         copy2(join(main_path,'CATALOGO_SEPOMEX',embo,'C_ASENTA.dbf'),'cat_asentamientos.dbf')
@@ -108,17 +112,17 @@ class disp_movil(calc_equiv):
         for root,dires,files in walk(".", topdown=False):
             if not dirs[3] in root:
                 for name in files:
-                    if name.endswith('_{0}.dbf'.format(fech_act.strftime('%b%y'))):
-                        fil = name.replace('_'+fech_act.strftime('%b%y'),'')
-                    elif name.endswith('{0}.dbf'.format(fech_act.strftime('%b%y'))):
-                        fil = name.replace(fech_act.strftime('%b%y'),'')
+                    if name.endswith('_{0}.dbf'.format(fech_act.strftime('%b%y').replace('.',''))):
+                        fil = name.replace('_'+fech_act.strftime('%b%y').replace('.',''),'')
+                    elif name.endswith('{0}.dbf'.format(fech_act.strftime('%b%y').replace('.',''))):
+                        fil = name.replace(fech_act.strftime('%b%y').replace('.',''),'')
                     else:
                         fil = name
                     copy2(join(main_dir,root.split('\\')[1],name),join(main_dir,dirs[3],fil))
         chdir(join(main_dir,dirs[3]))
         SetProgressorPosition(7)
         SetProgressorLabel(u"Creando agregado del catálogo de municipios".encode('cp1254'))
-        Statistics_analysis('C_MUNICI.dbf',join(getcwd(),'Sumarize_c_municipi.dbf'),[["C_MUNICIPI","MAX"]],"CVE_MUNICI")
+        Statistics_analysis('C_MUNICI.dbf',join(getcwd(),'Sumarize_c_municipi.dbf'),[["C_MUN","MAX"]],"CVE_MUN")
         SetProgressorPosition(8)
         ResetProgressor()
         del fil
@@ -220,8 +224,8 @@ class disp_movil(calc_equiv):
         CalculateField_management(tab_loc,"SITUA_LOC","1","PYTHON")
         tab_sumcmun = mapping.TableView('Sumarize_c_municipi.dbf')
         SetProgressorPosition(5)
-        AddJoin_management(tab_loc,"CVE_MUNC",tab_sumcmun,"CVE_MUNICI","KEEP_COMMON")
-        CalculateField_management(tab_loc,"cat_localidad.MUN_ID","!Sumarize_c_municipi.MAX_C_MUNI!","PYTHON")
+        AddJoin_management(tab_loc,"CVE_MUNC",tab_sumcmun,"CVE_MUN","KEEP_COMMON")
+        CalculateField_management(tab_loc,"cat_localidad.MUN_ID","!Sumarize_c_municipi.MAX_C_MUN!","PYTHON")
         SetProgressorPosition(6)
         del tab_sumcmun
         RemoveJoin_management(tab_loc)
@@ -300,9 +304,9 @@ class disp_movil(calc_equiv):
         SetProgressorPosition(5)
         CalculateField_management(tab_agb,"ENTIDAD_ID","int(!CVE_ENT!)","PYTHON")
         tab_sumcmun = mapping.TableView('Sumarize_c_municipi.dbf')
-        AddJoin_management(tab_agb,"CVE_MUNC",tab_sumcmun,"CVE_MUNICI","KEEP_COMMON")
+        AddJoin_management(tab_agb,"CVE_MUNC",tab_sumcmun,"CVE_MUN","KEEP_COMMON")
         SetProgressorPosition(6)
-        CalculateField_management(tab_agb,"cat_agebs.MUN_ID","!Sumarize_c_municipi.MAX_C_MUNI!","PYTHON")
+        CalculateField_management(tab_agb,"cat_agebs.MUN_ID","!Sumarize_c_municipi.MAX_C_MUN!","PYTHON")
         RemoveJoin_management(tab_agb)
         return
 
@@ -342,9 +346,9 @@ class disp_movil(calc_equiv):
         AddJoin_management(tab_mzs,"CVE_AGEBC",tab_agb,"AGEB","KEEP_ALL")
         AddJoin_management(tab_mzs,"cat_manzanas.CVE_LOCC",tab_iter,"CVE_ITER10","KEEP_ALL")
         SetProgressorPosition(3)
-        AddJoin_management(tab_mzs,"cat_manzanas.CVE_MUNC",tab_sumcmun,"CVE_MUNICI","KEEP_ALL")
+        AddJoin_management(tab_mzs,"cat_manzanas.CVE_MUNC",tab_sumcmun,"CVE_MUN","KEEP_ALL")
         flm = FieldMappings()
-        flm.loadFromString(u'CVE_ENT "CVE_ENT" true true false 2 Text 0 0 ,First,#,{0},{0}.CVE_ENT,-1,-1;CVE_MUNC "CVE_MUNC" true true false 5 Text 0 0 ,First,#,{0},{0}.CVE_MUNC,-1,-1;CVE_AGEBC "CVE_AGEBC" true true false 13 Text 0 0 ,First,#,{0},{0}.CVE_AGEBC,-1,-1;NOM_ENT "NOM_ENT" true true false 45 Text 0 0 ,First,#,{0},{0}.NOM_ENT,-1,-1;NOM_MUN "NOM_MUN" true true false 110 Text 0 0 ,First,#,{0},{0}.NOM_MUN,-1,-1;NOM_LOC "NOM_LOC" true true false 120 Text 0 0 ,First,#,{0},{0}.NOM_LOC,-1,-1;AGEB_ID "AGEB_ID" true true false 9 Long 0 9 ,First,#,{0},{1}.AGEB_ID,-1,-1;CVE_MZAC "CVE_MZAC" true true false 16 Text 0 0 ,First,#,{0},{0}.CVE_MZAC,-1,-1;MANZANA_ID "MANZANA_ID" true true false 9 Long 0 9 ,First,#,{0},{0}.OID,-1,-1;ENTIDAD_ID "ENTIDAD_ID" true true false 2 Short 0 2 ,First,#,{0},{0}.CVE_ENT,-1,-1;MANZANA "MANZANA" true true false 3 Text 0 0 ,Last,#,{0},{0}.CVE_MZAC,13,15;MUN_ID "MUN_ID" true true false 5 Long 0 5 ,First,#,{0},{3}.MAX_C_MUNI,-1,-1;CVE_LOCNUM "CVE_LOCNUM" true true false 4 Short 0 4 ,Last,#,{0},{0}.CVE_LOCC,5,8;CVE_LOCC "CVE_LOCC" true true false 9 Text 0 0 ,First,#,{0},{2}.CVECEFEMUL,-1,-1;AGEB "AGEB" true true false 5 Text 0 0 ,Last,#,{0},{0}.CVE_AGEBC,9,12;'.format('cat_manzanas','cat_agebs','locsiter10vscenfemul','Sumarize_c_municipi'))
+        flm.loadFromString(u'CVE_ENT "CVE_ENT" true true false 2 Text 0 0 ,First,#,{0},{0}.CVE_ENT,-1,-1;CVE_MUNC "CVE_MUNC" true true false 5 Text 0 0 ,First,#,{0},{0}.CVE_MUNC,-1,-1;CVE_AGEBC "CVE_AGEBC" true true false 13 Text 0 0 ,First,#,{0},{0}.CVE_AGEBC,-1,-1;NOM_ENT "NOM_ENT" true true false 45 Text 0 0 ,First,#,{0},{0}.NOM_ENT,-1,-1;NOM_MUN "NOM_MUN" true true false 110 Text 0 0 ,First,#,{0},{0}.NOM_MUN,-1,-1;NOM_LOC "NOM_LOC" true true false 120 Text 0 0 ,First,#,{0},{0}.NOM_LOC,-1,-1;AGEB_ID "AGEB_ID" true true false 9 Long 0 9 ,First,#,{0},{1}.AGEB_ID,-1,-1;CVE_MZAC "CVE_MZAC" true true false 16 Text 0 0 ,First,#,{0},{0}.CVE_MZAC,-1,-1;MANZANA_ID "MANZANA_ID" true true false 9 Long 0 9 ,First,#,{0},{0}.OID,-1,-1;ENTIDAD_ID "ENTIDAD_ID" true true false 2 Short 0 2 ,First,#,{0},{0}.CVE_ENT,-1,-1;MANZANA "MANZANA" true true false 3 Text 0 0 ,Last,#,{0},{0}.CVE_MZAC,13,15;MUN_ID "MUN_ID" true true false 5 Long 0 5 ,First,#,{0},{3}.MAX_C_MUN,-1,-1;CVE_LOCNUM "CVE_LOCNUM" true true false 4 Short 0 4 ,Last,#,{0},{0}.CVE_LOCC,5,8;CVE_LOCC "CVE_LOCC" true true false 9 Text 0 0 ,First,#,{0},{2}.CVECEFEMUL,-1,-1;AGEB "AGEB" true true false 5 Text 0 0 ,Last,#,{0},{0}.CVE_AGEBC,9,12;'.format('cat_manzanas','cat_agebs','locsiter10vscenfemul','Sumarize_c_municipi'))
 
         SetProgressorLabel(u"Proceso para manzanas:\nCreando cat_manzanas_completo.dbf (Este paso puede tardar algunos minutos)..")
         SetProgressorPosition(4)
@@ -366,7 +370,7 @@ class disp_movil(calc_equiv):
         SetProgressorLabel(u"Proceso para codigos postales:\nCreando cat_cp_completo.dbf..")
         SetProgressorPosition(6)
         tab_cp = mapping.TableView('cat_cp_completo.dbf')
-        DeleteField_management(tab_cp,[u"C_CODIGO_P",u"CVE_CODIGO",u"NOM_CODIGO",u"C_MUNICIPI",u"FCH_INICIO",u"CVE_MUNICI"])
+        DeleteField_management(tab_cp,[u"C_CODIGO_P",u"CVE_CODIGO",u"NOM_CODIGO",u"C_MUN",u"FCH_INICIO",u"CVE_MUN"])
         SetProgressorPosition(7)
         copy2('cat_cp_completo.dbf',join(u'FINALES','cat_cp.dbf'))
         tab_cp = mapping.TableView(join(u'FINALES','cat_cp.dbf'))
@@ -387,9 +391,9 @@ class disp_movil(calc_equiv):
         SetProgressorPosition(2)
         CalculateField_management(tab_cp,"ENTIDAD_ID","!CVE_MUNICI![:2]","PYTHON")
         tab_sumcmun = mapping.TableView('Sumarize_c_municipi.dbf')
-        AddJoin_management(tab_cp,"CVE_MUNICI",tab_sumcmun,"CVE_MUNICI","KEEP_COMMON")
+        AddJoin_management(tab_cp,"CVE_MUNICI",tab_sumcmun,"CVE_MUN","KEEP_COMMON")
         SetProgressorPosition(3)
-        CalculateField_management(tab_cp,"cat_cp.MUN_ID","!Sumarize_c_municipi.MAX_C_MUNI!","PYTHON")
+        CalculateField_management(tab_cp,"cat_cp.MUN_ID","!Sumarize_c_municipi.MAX_C_MUN!","PYTHON")
         RemoveJoin_management(tab_cp)
         SetProgressorPosition(4)
         CalculateField_management(tab_cp,"CP","!CVE_CODIGO!","PYTHON")

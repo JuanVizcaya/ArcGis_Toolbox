@@ -7,7 +7,7 @@ from arcpy.mapping import TableView
 from xlrd import open_workbook
 from xlutils.copy import copy
 from xlwt import easyxf
-from dbfpy.dbf import Dbf
+from .dbfpy.dbf import Dbf
 from os import chdir, getcwd,startfile
 from os.path import dirname,abspath,join
 from .utils import mkd

@@ -16,6 +16,7 @@ class valides(object):
 	locsit = [u'OID', u'CVE_ITER10', u'CVECEFEMUL']
 	preloc = [u'CVEENT_ORI', u'CVEMUNCORI', u'CVELOCCORI', u'CVE_ENT', u'CVE_MUNC', u'CVE_LOCC']
 	univer = [u'OID', u'CVE_LOCC', u'LAMBX', u'LAMBY', u'LONGI', u'LATI']
+	cmuni = [u'OID', u'C_ENTIDAD', u'C_MUN', u'CVE_ENT', u'CVE_MUN', u'NOM_ENT', u'NOM_MUN', u'FCH_INICIO']
 	
 	def dbf(self,tab,name,fields):
 	    flds_intab = [fld.name for fld in ListFields(tab.valueAsText)]
@@ -204,7 +205,7 @@ class Valide_C01(Tool):
 			parameters[3].value = parameters[3].valueAsText.split(' ')[0]
 		return
 
-	"""def updateMessages(self, parameters):
+	def updateMessages(self, parameters):
 		vld = valides()
 		if parameters[0].value:
 			self.book = open_workbook(parameters[0].valueAsText)
@@ -213,8 +214,8 @@ class Valide_C01(Tool):
 		if parameters[3].altered and len(parameters[3].valueAsText.split('/')) != 3:
 			parameters[3].setErrorMessage("La fecha debe ser del formato: dd/mm/aaaa")
 		if parameters[4].value:
-			parameters[4] = vld.dbf(parameters[4],None,[u'OID', u'C_ENTIDAD', u'C_MUN', u'CVE_ENT', u'CVE_MUN', u'NOM_ENT', u'NOM_MUNICI', u'FCH_INI', u'FCH_SIS', u'USUARIO', u'ESTATUS'])
-		return"""
+			parameters[4] = vld.dbf(parameters[4],None,vld.cmuni)
+		return
 
 class Valide_D01(Tool):
 	def updateParameters(self, parameters):
@@ -232,7 +233,7 @@ class Valide_D01(Tool):
 		if parameters[2].value:
 			parameters[2] = vld.dbf(parameters[2],'locsiter10vscenfemul',vld.locsit)
 		if parameters[3].value:
-			parameters[3] = vld.dbf(parameters[3],None,[u'OID', u'C_MUNICIPI', u'C_ENTIDAD_', u'NOM_MUNICI', u'FCH_SISTEM', u'FCH_INICIO', u'USUARIO_CA', u'CVE_MUNICI', u'ESTATUS'])
+			parameters[3] = vld.dbf(parameters[3],None,vld.cmuni)
 		return
 
 class Valide_D02(Tool):

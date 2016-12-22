@@ -7,7 +7,7 @@ from os.path import dirname, abspath
 from itertools import izip
 from .equivalencias import calc_equiv
 from .utils import today
-from dbfpy.dbf import Dbf
+from .dbfpy.dbf import Dbf
 from xlrd import open_workbook
 from xlwt import easyxf
 from xlutils.copy import copy
