@@ -1,6 +1,3 @@
-
-
-
 # -*- coding: cp1252 -*-
 from __future__ import unicode_literals, print_function
 from arcpy import Parameter, mapping, RefreshTOC, SetProgressor, CreateUniqueName, AddMessage, SetProgressorPosition, Statistics_analysis, ResetProgressor, ListFields, AddField_management, AddJoin_management, CalculateField_management, RemoveJoin_management, FieldMappings, SetProgressorLabel, DeleteField_management, TableToTable_conversion, SelectLayerByAttribute_management,Merge_management

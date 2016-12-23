@@ -49,7 +49,7 @@ def readFromStr(url):
     return pickle.loads(urlopen(url).read())
 
 def today():
-    return dt.today().strftime("%d%b%y")
+    return dt.today().strftime("%d%b%y").replace('.','')
 
 def unzip(path):
     with ZipFile(path,'r') as zf:
@@ -77,6 +77,10 @@ def comas(i):
 
 def mktable(name,fields):
     CreateTable_management(getcwd(),name)
+    with open(join(getcwd(),name),'r+') as f:
+        f.next()
+        f.seek(29)
+        f.write("Y")
     tab = mapping.TableView(name)
     for fld in fields:
         AddField_management(tab,*fld)
